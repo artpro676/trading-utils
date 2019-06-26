@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>TV Charts</title>
+</head>
+<body>
+<div class="symbols-list">
+    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical"></div>
+</div>
+<div class="tab-content" id="v-pills-tabContent"></div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="symbols.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<style>
+    .symbols-list {
+        overflow-y: auto;
+        height: 1080px;
+        width: 100px;
+        position: fixed;
+        left: 0;
+        top: 0;
+    }
+
+    .tab-content{
+        width: calc(100% - 110px);
+        display: block;
+        float: right;
+    }
+
+    /* width */
+    ::-webkit-scrollbar {
+        width: 5px;
+        background-color: #4a4a4a;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #424242;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    /*.chart {*/
+    /*    height: 400px;*/
+    /*}*/
+</style>
+<script>
+    $(() => {
+        $('.symbols-list').height(`${window.innerHeight}px`);
+
+        const tvCharts = {};
+
+        SYMBOLS.forEach(symbol => {
+            $('#v-pills-tab').append(`<a class="nav-link" id="v-pills-profile-tab" data-symbol="${symbol}" data-toggle="pill" href="#v-pills-${symbol}" role="tab" aria-controls="v-pills-${symbol}" aria-selected="false">${symbol}</a>`);
+
+            $('#v-pills-tabContent').append(`
+            <div
+                class="tab-pane fade"
+                id="v-pills-${symbol}"
+                role="tabpanel"
+                aria-labelledby="v-pills-${symbol}-tab"
+                >
+                    <a href="https://www.tradingview.com/symbols/${symbol}" style="float: right"><h1>Go to trading view</h1></a>
+                    <h1>${symbol}</h1>
+
+                    <hr/>
+
+                    <div class="row charts">
+                        <div class="col-3 chart" id="tv5m"><h4>5m</h4><div id="tradingview_5_${symbol}"></div></div>
+                        <div class="col-3 chart" id="tv15m"><h4>15m</h4><div id="tradingview_15_${symbol}"></div></div>
+                        <div class="col-3 chart" id="tv30m"><h4>30m</h4><div id="tradingview_30_${symbol}"></div></div>
+                        <div class="col-3 chart" id="tv120m"><h4>2h</h4><div id="tradingview_120_${symbol}"></div></div>
+                    </div>
+
+                    <hr/>
+
+                    <div id="tradingview_1_${symbol}"></div>
+
+                </div>
+            `);
+        });
+        $('#v-pills-tab a:first').addClass('active');
+        $('#v-pills-tabContent div.tab-pane:first').addClass('show active');
+        $('#v-pills-tab a').on('click', function (e) {
+            e.preventDefault();
+            const symbol = $(this).attr('data-symbol');
+
+            if (!tvCharts[symbol]) {
+                tvCharts[symbol] = new TradingView.widget(
+                    {
+                        "width": $('.tab-content').width(),
+                        "height": 5000,
+                        "symbol": `BINANCE:${symbol}`,
+                        "interval": "1",
+                        "timezone": "Etc/UTC",
+                        "theme": "Light",
+                        "style": "1",
+                        "locale": "en",
+                        "toolbar_bg": "#f1f3f6",
+                        "enable_publishing": false,
+                        "allow_symbol_change": true,
+                        "container_id": `tradingview_1_${symbol}`,
+                        "studies": [
+                            "ACCD@tv-basicstudies",
+                            "studyADR@tv-basicstudies",
+                            "AROON@tv-basicstudies",
+                            "ATR@tv-basicstudies",
+                            "AwesomeOscillator@tv-basicstudies",
+                            "BB@tv-basicstudies",
+                            "BollingerBandsR@tv-basicstudies",
+                            "BollingerBandsWidth@tv-basicstudies",
+                            "CMF@tv-basicstudies",
+                            "ChaikinOscillator@tv-basicstudies",
+                            "chandeMO@tv-basicstudies",
+                            "ChoppinessIndex@tv-basicstudies",
+                            "CCI@tv-basicstudies",
+                            "CRSI@tv-basicstudies",
+                            "CorrelationCoefficient@tv-basicstudies",
+                            "DetrendedPriceOscillator@tv-basicstudies",
+                            "DM@tv-basicstudies",
+                            "DONCH@tv-basicstudies",
+                            "DoubleEMA@tv-basicstudies",
+                            "EaseOfMovement@tv-basicstudies",
+                            "EFI@tv-basicstudies",
+                            "ElliottWave@tv-basicstudies",
+                            // "ENV@tv-basicstudies",
+                            "FisherTransform@tv-basicstudies",
+                            "HV@tv-basicstudies",
+                            "hullMA@tv-basicstudies",
+                            "IchimokuCloud@tv-basicstudies",
+                            "KLTNR@tv-basicstudies",
+                            "KST@tv-basicstudies",
+                            "LinearRegression@tv-basicstudies",
+                            "MACD@tv-basicstudies",
+                            "MOM@tv-basicstudies",
+                            "MF@tv-basicstudies",
+                            "MoonPhases@tv-basicstudies",
+                            "MASimple@tv-basicstudies",
+                            "MAExp@tv-basicstudies",
+                            "MAWeighted@tv-basicstudies",
+                            "OBV@tv-basicstudies",
+                            "PSAR@tv-basicstudies",
+                            "PivotPointsHighLow@tv-basicstudies",
+                            "PivotPointsStandard@tv-basicstudies",
+                            "PriceOsc@tv-basicstudies",
+                            "PriceVolumeTrend@tv-basicstudies",
+                            "ROC@tv-basicstudies",
+                            "RSI@tv-basicstudies",
+                            "VigorIndex@tv-basicstudies",
+                            "VolatilityIndex@tv-basicstudies",
+                            "SMIErgodicIndicator@tv-basicstudies",
+                            "SMIErgodicOscillator@tv-basicstudies",
+                            "Stochastic@tv-basicstudies",
+                            "StochasticRSI@tv-basicstudies",
+                            "TripleEMA@tv-basicstudies",
+                            "Trix@tv-basicstudies",
+                            "UltimateOsc@tv-basicstudies",
+                            "VSTOP@tv-basicstudies",
+                            "Volume@tv-basicstudies",
+                            "VWAP@tv-basicstudies",
+                            "MAVolumeWeighted@tv-basicstudies",
+                            "WilliamR@tv-basicstudies",
+                            "WilliamsAlligator@tv-basicstudies",
+                            "WilliamsFractal@tv-basicstudies",
+                            "ZigZag@tv-basicstudies",
+                        ]
+                    }
+                );
+
+                [5, 15, 30, 120].forEach(interval => {
+                    new TradingView.widget(
+                        {
+                            "width": $(`.tab-content #tv${interval}m`).width(),
+                            "height": 500,
+                            "symbol": `BINANCE:${symbol}`,
+                            "interval": interval.toString(),
+                            "timezone": "Etc/UTC",
+                            "theme": "Light",
+                            "style": "1",
+                            "locale": "en",
+                            "toolbar_bg": "#f1f3f6",
+                            "enable_publishing": false,
+                            "hide_top_toolbar": true,
+                            "hide_legend": true,
+                            "save_image": false,
+                            "container_id": `tradingview_${interval}_${symbol}`,
+                            "studies": [
+                                "RSI@tv-basicstudies",
+                                "MACD@tv-basicstudies",
+                            ]
+                        }
+                    );
+                })
+
+            }
+        });
+
+    })
+</script>
+
+</body>
+</html>
